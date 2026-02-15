@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>Pel·lícules</title>
+
+  <style>
+    /* Estil general de la pàgina */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    /* Contenidor de la caixa de cerca */
+    .search-bar {
+      display: flex;              /* Col·loca input i botó en línia */
+      justify-content: center;    /* Centra horitzontalment */
+      gap: 10px;                  /* Espai entre input i botó */
+      margin-bottom: 30px;
+    }
+
+    /* Caixa de text de cerca */
+    .search-bar input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+
+    /* Botó de cerca */
+    .search-bar button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Grid on es mostraran les targetes */
+    .grid {
+      display: grid; 
+      /* Crea columnes automàtiques adaptables */
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    /* Targeta individual de cada pel·lícula */
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Títol de la pel·lícula */
+    .card h3 {
+      margin-top: 0;
+    }
+
+    /* Text de la informació */
+    .card p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== CAIXA DE CERCA ===== -->
+  <header class="search-bar">
+    <!-- Input on l’usuari escriu el text a cercar -->
+    <input type="text" id="searchInput" placeholder="Cerca pel·lícules...">
+
+    <!-- Botó per executar la cerca -->
+    <button id="searchBtn">Cercar</button>
+  </header>
+
+  <!-- ===== CONTENIDOR DEL GRID ===== -->
+  <main>
+    <!-- Aquí s’afegiran dinàmicament les targetes -->
+    <div id="moviesGrid" class="grid"></div>
+  </main>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    /* 
+      Array d’objectes amb la informació de les pel·lícules.
+      Cada objecte representa una pel·lícula.
+    */
+    const pelicules = [
+      { title: "The Godfather", year: 1972, genre: "Drama", director: "Francis Ford Coppola", actors: "Marlon Brando, Al Pacino", oscars: 3 },
+      { title: "Pulp Fiction", year: 1994, genre: "Crime", director: "Quentin Tarantino", actors: "John Travolta, Uma Thurman", oscars: 10 },
+      { title: "Schindler's List", year: 1993, genre: "Drama", director: "Steven Spielberg", actors: "Liam Neeson, Ralph Fiennes", oscars: 7 },
+      { title: "The Dark Knight", year: 2008, genre: "Action", director: "Christopher Nolan", actors: "Christian Bale, Heath Ledger", oscars: 2 },
+      { title: "Titanic", year: 1997, genre: "Romance", director: "James Cameron", actors: "Leonardo DiCaprio, Kate Winslet", oscars: 11 },
+      { title: "Forrest Gump", year: 1994, genre: "Drama", director: "Robert Zemeckis", actors: "Tom Hanks, Robin Wright", oscars: 6 },
+      { title: "The Lord of the Rings: The Return of the King", year: 2003, genre: "Fantasy", director: "Peter Jackson", actors: "Elijah Wood, Ian McKellen", oscars: 11 },
+      { title: "Inception", year: 2010, genre: "Science Fiction", director: "Christopher Nolan", actors: "Leonardo DiCaprio", oscars: 4 },
+      { title: "Gladiator", year: 2000, genre: "Action", director: "Ridley Scott", actors: "Russell Crowe, Joaquin Phoenix", oscars: 5 },
+      { title: "The Matrix", year: 1999, genre: "Science Fiction", director: "The Wachowskis", actors: "Keanu Reeves, Laurence Fishburne", oscars: 4 }
+    ];
+
+    /* 
+      Guardem referències als elements HTML
+      per no haver-los de buscar cada vegada
+    */
+    const grid = document.getElementById("moviesGrid");
+    const input = document.getElementById("searchInput");
+    const button = document.getElementById("searchBtn");
+
+    /*
+      Funció que mostra una llista de pel·lícules
+      rebuda com a paràmetre
+    */
+    function mostrarPelicules(llista) {
+      // Esborrem el contingut actual del grid
+      grid.innerHTML = "";
+
+      // Recorrem totes les pel·lícules de la llista
+      llista.forEach(peli => {
+        // Creem una nova targeta
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        // Contingut HTML de la targeta
+        card.innerHTML = `
+          <h3>${peli.title}</h3>
+          <p><strong>Any:</strong> ${peli.year}</p>
+          <p><strong>Gènere:</strong> ${peli.genre}</p>
+          <p><strong>Director:</strong> ${peli.director}</p>
+          <p><strong>Actors:</strong> ${peli.actors}</p>
+          <p><strong>Oscars:</strong> ${peli.oscars}</p>
+        `;
+
+        // Afegim la targeta al grid
+        grid.appendChild(card);
+      });
+    }
+
+    /*
+      Funció que filtra les pel·lícules segons
+      el text introduït a la caixa de cerca
+    */
+    function filtrarPelicules() {
+      // Text escrit per l’usuari (en minúscules)
+      const text = input.value.toLowerCase();
+
+      // Si la caixa està buida, mostrem totes les pel·lícules
+      if (text === "") {
+        mostrarPelicules(pelicules);
+        return;
+      }
+
+      /*
+        Filtra les pel·lícules:
+        - Object.values(peli): agafa tots els camps de l’objecte
+        - some(): comprova si algun camp conté el text
+      */
+      const resultat = pelicules.filter(peli =>
+        Object.values(peli).some(valor =>
+          valor.toString().toLowerCase().includes(text)
+        )
+      );
+
+      // Mostrem el resultat filtrat
+      mostrarPelicules(resultat);
+    }
+
+    // Executa la cerca en clicar el botó
+    button.addEventListener("click", filtrarPelicules);
+
+    // Executa la cerca mentre s’escriu
+    input.addEventListener("keyup", filtrarPelicules);
+
+    // Mostra totes les pel·lícules en carregar la pàgina
+    mostrarPelicules(pelicules);
+  </script>
+
+</body>
+</html>

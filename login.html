@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+
+<title>Login</title>
+
+<style>
+
+    body {
+        font-family: Arial;   
+        padding: 40px;      
+    }
+
+    /* Formulari de login */
+    form {
+        width: 300px;         
+        margin-bottom: 20px; 
+    }
+
+    /* Camps de text i contrasenya */
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;         /* Ocupa tot l’ample del form */
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    /* Contenidor del checkbox */
+    .checkbox-container {
+        display: flex;       /* Checkbox i text en línia */
+        align-items: center;
+        gap: 5px;            /* Espai entre checkbox i label */
+        margin-bottom: 10px;
+    }
+
+    /* El checkbox no ocupa el 100% */
+    .checkbox-container input {
+        width: auto;
+    }
+
+    /* Botó d’entrada */
+    button {
+        padding: 10px;
+        width: 100%;
+        background-color: green;
+        color: white;
+        border: none;
+        cursor: pointer;
+
+        /* El botó està ocult fins que tot és correcte */
+        display: none;
+    }
+
+    /* Text informatiu de validació */
+    .info {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    /* Colors segons validació */
+    .valid { color: green; }
+    .invalid { color: red; }
+</style>
+</head>
+
+<body>
+
+<h2>Login</h2>
+
+<form id="loginForm">
+
+    <!-- Camp de nom d’usuari -->
+    <input type="text" id="username" placeholder="Nom d'usuari">
+
+    <!-- Camp de contrasenya -->
+    <input type="password" id="password" placeholder="Contrasenya">
+
+    <!-- Checkbox per mostrar o amagar la contrasenya -->
+    <div class="checkbox-container">
+        <input type="checkbox" id="showPassword">
+        <label for="showPassword">Mostrar contrasenya</label>
+    </div>
+
+    <!-- Botó d’enviament -->
+    <button type="submit" id="submitBtn">Entrar</button>
+
+</form>
+
+<!-- Missatges d’informació -->
+<div id="userInfo" class="info"></div>
+<div id="passInfo" class="info"></div>
+
+<script>
+/* ===== REFERÈNCIES ALS ELEMENTS HTML ===== */
+const username = document.getElementById("username");     // Input usuari
+const password = document.getElementById("password");     // Input contrasenya
+const showPassword = document.getElementById("showPassword"); // Checkbox
+const userInfo = document.getElementById("userInfo");     // Info usuari
+const passInfo = document.getElementById("passInfo");     // Info contrasenya
+const submitBtn = document.getElementById("submitBtn");   // Botó entrar
+const form = document.getElementById("loginForm");        // Formulari
+
+
+/* ===== MOSTRAR / AMAGAR CONTRASENYA ===== */
+showPassword.addEventListener("change", function() {
+    // Si el checkbox està marcat → text
+    // Si no està marcat → password
+    password.type = this.checked ? "text" : "password";
+});
+
+
+/* ===== FUNCIÓ DE VALIDACIÓ ===== */
+function validateForm() {
+
+    /* --- VALIDACIÓ USUARI --- */
+
+    // Comprova si conté el símbol @
+    let userValid = username.value.includes("@");
+
+    // Si el camp està buit
+    if (username.value === "") {
+        userInfo.textContent = "";
+    }
+    // Si és correcte
+    else if (userValid) {
+        userInfo.textContent = "✔ Nom correcte";
+        userInfo.className = "info valid";
+    }
+    // Si no és correcte
+    else {
+        userInfo.textContent = "✘ Ha de contenir una @";
+        userInfo.className = "info invalid";
+    }
+
+
+    /* --- VALIDACIÓ CONTRASENYA --- */
+
+    let pass = password.value;
+
+    // Comprovacions amb expressions regulars
+    let hasLower = /[a-z]/.test(pass);      // Té minúscula
+    let hasUpper = /[A-Z]/.test(pass);      // Té majúscula
+    let hasNumber = /[0-9]/.test(pass);     // Té número
+    let hasLength = pass.length >= 8;       // Mínim 8 caràcters
+
+    // La contrasenya és vàlida si compleix totes les condicions
+    let passValid = hasLower && hasUpper && hasNumber && hasLength;
+
+    // Si està buida, no mostra res
+    if (pass === "") {
+        passInfo.textContent = "";
+    } else {
+        // Mostra cada requisit amb ✔ o ✘
+        passInfo.innerHTML = `
+            ${hasLower ? "✔" : "✘"} Minúscula<br>
+            ${hasUpper ? "✔" : "✘"} Majúscula<br>
+            ${hasNumber ? "✔" : "✘"} Número<br>
+            ${hasLength ? "✔" : "✘"} 8 caràcters mínim
+        `;
+        passInfo.className = passValid ? "info valid" : "info invalid";
+    }
+
+
+    /* --- MOSTRAR O AMAGAR EL BOTÓ --- */
+
+    // El botó només apareix si tot és correcte
+    if (userValid && passValid) {
+        submitBtn.style.display = "block";
+        userInfo.style.display = "none";
+        passInfo.style.display = "none";
+    } else {
+        submitBtn.style.display = "none";
+        userInfo.style.display = "block";
+        passInfo.style.display = "block";
+    }
+}
+
+
+// Validació mentre s’escriu el nom d’usuari
+username.addEventListener("input", validateForm);
+
+// Validació mentre s’escriu la contrasenya
+password.addEventListener("input", validateForm);
+
+
+/* ===== ENVIAMENT DEL FORMULARI ===== */
+form.addEventListener("submit", function(e) {
+    // Evita que el formulari s’enviï realment
+    e.preventDefault();
+
+    // Redirigeix a la pàgina de pel·lícules
+    window.location.href = "pelicules.html";
+});
+
+</script>
+
+</body>
+</html>
